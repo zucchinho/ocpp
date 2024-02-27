@@ -45,6 +45,9 @@ func (bp *BasicProjection) NumConnectors(ctx context.Context, stationID string) 
 			case domain.EventTypeMeterValuesNotification:
 				numConnectors = len(event.Payload.(domain.MeterValuesNotificationPayload).MeterValues)
 				latestRelevantEvent = &event
+			case domain.EventTypeMeterValuesResponse:
+				numConnectors = len(event.Payload.(domain.MeterValuesResponsePayload).MeterValues)
+				latestRelevantEvent = &event
 			}
 		}
 	}
@@ -187,7 +190,7 @@ func (bp *BasicProjection) getLatestEventsForStationID(ctx context.Context, stat
 
 		if eventIsForStationID {
 			if existingEventForType, ok := latestEvents[domain.EventTypeConnectorListRequest]; !ok || event.OccurredAt.After(existingEventForType.OccurredAt) {
-				latestEvents[domain.EventTypeConnectorListRequest] = event
+				latestEvents[event.MessageType] = event
 			}
 		}
 	}
