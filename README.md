@@ -13,3 +13,15 @@ A placeholder implementation which simply stores events in memory for them to be
 ## Basic
 
 A basic projection which calculates the current state of the charging stations based on the events currently in the source
+
+# Building
+
+```sh
+go build cmd/cli/json_event_consumer/main.go
+```
+
+# Running
+
+```sh
+./main -input events.json
+```
