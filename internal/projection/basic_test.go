@@ -30,9 +30,10 @@ func TestNewBasicProjection(t *testing.T) {
 
 func TestNumChargingStations(t *testing.T) {
 	tests := []struct {
-		name   string
-		events []domain.Event
-		want   int
+		name    string
+		events  []domain.Event
+		want    int
+		wantErr bool
 	}{
 		{
 			name:   "no events",
@@ -48,8 +49,8 @@ func TestNumChargingStations(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.ConnectorListRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -58,8 +59,8 @@ func TestNumChargingStations(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListResponse,
 					OccurredAt:    now,
-					Payload: domain.ConnectorListResponsePayload{
-						NumConnectors: 2,
+					Payload: map[string]any{
+						"NumConnectors": 2,
 					},
 				},
 				{
@@ -68,8 +69,8 @@ func TestNumChargingStations(t *testing.T) {
 					CorrelationID: "correlation-2",
 					MessageType:   domain.EventTypeConnectorListRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.ConnectorListRequestPayload{
-						StationID: "station-2",
+					Payload: map[string]any{
+						"StationID": "station-2",
 					},
 				},
 				{
@@ -78,8 +79,8 @@ func TestNumChargingStations(t *testing.T) {
 					CorrelationID: "correlation-2",
 					MessageType:   domain.EventTypeConnectorListResponse,
 					OccurredAt:    now,
-					Payload: domain.ConnectorListResponsePayload{
-						NumConnectors: 2,
+					Payload: map[string]any{
+						"NumConnectors": 2,
 					},
 				},
 			},
@@ -94,8 +95,8 @@ func TestNumChargingStations(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesNotification,
 					OccurredAt:    now,
-					Payload: domain.MeterValuesNotificationPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 			},
@@ -110,8 +111,8 @@ func TestNumChargingStations(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.MeterValuesRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -120,8 +121,8 @@ func TestNumChargingStations(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesResponse,
 					OccurredAt:    now,
-					Payload: domain.MeterValuesResponsePayload{
-						MeterValues: []domain.MeterValue{},
+					Payload: map[string]any{
+						"MeterValues": []domain.MeterValue{},
 					},
 				},
 			},
@@ -139,9 +140,14 @@ func TestNumChargingStations(t *testing.T) {
 			mockEventSource.EXPECT().GetAll(gomock.Any()).Return(tt.events)
 
 			// act
-			numChargingStations := bp.NumChargingStations(context.Background())
+			numChargingStations, err := bp.NumChargingStations(context.Background())
 
 			// assert
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+
 			assert.Equal(t, tt.want, numChargingStations)
 		})
 	}
@@ -166,8 +172,8 @@ func TestNumConnectors(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.ConnectorListRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 			},
@@ -185,8 +191,8 @@ func TestNumConnectors(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.ConnectorListRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -195,8 +201,8 @@ func TestNumConnectors(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListResponse,
 					OccurredAt:    now,
-					Payload: domain.ConnectorListResponsePayload{
-						NumConnectors: 2,
+					Payload: map[string]any{
+						"NumConnectors": 2,
 					},
 				},
 			},
@@ -213,19 +219,19 @@ func TestNumConnectors(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesNotification,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.MeterValuesNotificationPayload{
-						StationID: "station-1",
-						MeterValues: []domain.MeterValue{
+					Payload: map[string]any{
+						"StationID": "station-1",
+						"MeterValues": []domain.MeterValue{
 							{
-								ConnectorID: "connector-1",
+								ConnectorID: 1,
 								Reading:     "100",
 							},
 							{
-								ConnectorID: "connector-2",
+								ConnectorID: 2,
 								Reading:     "200",
 							},
 							{
-								ConnectorID: "connector-3",
+								ConnectorID: 3,
 								Reading:     "300",
 							},
 						},
@@ -244,8 +250,8 @@ func TestNumConnectors(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.MeterValuesRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -254,10 +260,10 @@ func TestNumConnectors(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesResponse,
 					OccurredAt:    now,
-					Payload: domain.MeterValuesResponsePayload{
-						MeterValues: []domain.MeterValue{
+					Payload: map[string]any{
+						"MeterValues": []domain.MeterValue{
 							{
-								ConnectorID: "connector-1",
+								ConnectorID: 1,
 								Reading:     "100",
 							},
 						},
@@ -316,8 +322,8 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.MeterValuesRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -326,10 +332,10 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesResponse,
 					OccurredAt:    now,
-					Payload: domain.MeterValuesResponsePayload{
-						MeterValues: []domain.MeterValue{
+					Payload: map[string]any{
+						"MeterValues": []domain.MeterValue{
 							{
-								ConnectorID: "connector-1",
+								ConnectorID: 1,
 								Reading:     "100",
 							},
 						},
@@ -350,8 +356,8 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.ConnectorListRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -360,8 +366,8 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListResponse,
 					OccurredAt:    now,
-					Payload: domain.ConnectorListResponsePayload{
-						NumConnectors: 2,
+					Payload: map[string]any{
+						"NumConnectors": 2,
 					},
 				},
 			},
@@ -382,19 +388,19 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesNotification,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.MeterValuesNotificationPayload{
-						StationID: "station-1",
-						MeterValues: []domain.MeterValue{
+					Payload: map[string]any{
+						"StationID": "station-1",
+						"MeterValues": []domain.MeterValue{
 							{
-								ConnectorID: "connector-1",
+								ConnectorID: 1,
 								Reading:     "100",
 							},
 							{
-								ConnectorID: "connector-2",
+								ConnectorID: 2,
 								Reading:     "200",
 							},
 							{
-								ConnectorID: "connector-3",
+								ConnectorID: 3,
 								Reading:     "300",
 							},
 						},
@@ -409,19 +415,19 @@ func TestChargingStation(t *testing.T) {
 				UpdatedAt:     oneMinuteAgo,
 				Connectors: []domain.Connector{
 					{
-						ID:                "connector-1",
+						ID:                1,
 						ChargingStationID: "station-1",
 						Reading:           "100",
 						UpdatedAt:         oneMinuteAgo,
 					},
 					{
-						ID:                "connector-2",
+						ID:                2,
 						ChargingStationID: "station-1",
 						Reading:           "200",
 						UpdatedAt:         oneMinuteAgo,
 					},
 					{
-						ID:                "connector-3",
+						ID:                3,
 						ChargingStationID: "station-1",
 						Reading:           "300",
 						UpdatedAt:         oneMinuteAgo,
@@ -438,8 +444,8 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.MeterValuesRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -448,10 +454,10 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesResponse,
 					OccurredAt:    now,
-					Payload: domain.MeterValuesResponsePayload{
-						MeterValues: []domain.MeterValue{
+					Payload: map[string]any{
+						"MeterValues": []domain.MeterValue{
 							{
-								ConnectorID: "connector-1",
+								ConnectorID: 1,
 								Reading:     "100",
 							},
 						},
@@ -466,7 +472,7 @@ func TestChargingStation(t *testing.T) {
 				UpdatedAt:     now,
 				Connectors: []domain.Connector{
 					{
-						ID:                "connector-1",
+						ID:                1,
 						ChargingStationID: "station-1",
 						Reading:           "100",
 						UpdatedAt:         now,
@@ -483,19 +489,19 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeMeterValuesNotification,
 					OccurredAt:    twoMinutesAgo,
-					Payload: domain.MeterValuesNotificationPayload{
-						StationID: "station-1",
-						MeterValues: []domain.MeterValue{
+					Payload: map[string]any{
+						"StationID": "station-1",
+						"MeterValues": []domain.MeterValue{
 							{
-								ConnectorID: "connector-1",
+								ConnectorID: 1,
 								Reading:     "100",
 							},
 							{
-								ConnectorID: "connector-2",
+								ConnectorID: 2,
 								Reading:     "200",
 							},
 							{
-								ConnectorID: "connector-3",
+								ConnectorID: 3,
 								Reading:     "300",
 							},
 						},
@@ -507,8 +513,8 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-2",
 					MessageType:   domain.EventTypeMeterValuesRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.MeterValuesRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -517,10 +523,10 @@ func TestChargingStation(t *testing.T) {
 					CorrelationID: "correlation-2",
 					MessageType:   domain.EventTypeMeterValuesResponse,
 					OccurredAt:    now,
-					Payload: domain.MeterValuesResponsePayload{
-						MeterValues: []domain.MeterValue{
+					Payload: map[string]any{
+						"MeterValues": []domain.MeterValue{
 							{
-								ConnectorID: "connector-1",
+								ConnectorID: 1,
 								Reading:     "120",
 							},
 						},
@@ -535,20 +541,20 @@ func TestChargingStation(t *testing.T) {
 				UpdatedAt:     now,
 				Connectors: []domain.Connector{
 					{
-						ID:                "connector-1",
+						ID:                1,
 						ChargingStationID: "station-1",
 						// The reading from the later MeterValuesResponse event should be used.
 						Reading:   "120",
 						UpdatedAt: now,
 					},
 					{
-						ID:                "connector-2",
+						ID:                2,
 						ChargingStationID: "station-1",
 						Reading:           "200",
 						UpdatedAt:         twoMinutesAgo,
 					},
 					{
-						ID:                "connector-3",
+						ID:                3,
 						ChargingStationID: "station-1",
 						Reading:           "300",
 						UpdatedAt:         twoMinutesAgo,
@@ -592,6 +598,7 @@ func TestChargingStations(t *testing.T) {
 		events         []domain.Event
 		correlationIDs []string
 		want           []domain.ChargingStation
+		wantErr        bool
 	}{
 		{
 			name:   "no events",
@@ -607,8 +614,8 @@ func TestChargingStations(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.ConnectorListRequestPayload{
-						StationID: "station-1",
+					Payload: map[string]any{
+						"StationID": "station-1",
 					},
 				},
 				{
@@ -617,8 +624,8 @@ func TestChargingStations(t *testing.T) {
 					CorrelationID: "correlation-1",
 					MessageType:   domain.EventTypeConnectorListResponse,
 					OccurredAt:    now,
-					Payload: domain.ConnectorListResponsePayload{
-						NumConnectors: 2,
+					Payload: map[string]any{
+						"NumConnectors": 2,
 					},
 				},
 				{
@@ -627,8 +634,8 @@ func TestChargingStations(t *testing.T) {
 					CorrelationID: "correlation-2",
 					MessageType:   domain.EventTypeConnectorListRequest,
 					OccurredAt:    oneMinuteAgo,
-					Payload: domain.ConnectorListRequestPayload{
-						StationID: "station-2",
+					Payload: map[string]any{
+						"StationID": "station-2",
 					},
 				},
 				{
@@ -637,8 +644,8 @@ func TestChargingStations(t *testing.T) {
 					CorrelationID: "correlation-2",
 					MessageType:   domain.EventTypeConnectorListResponse,
 					OccurredAt:    now,
-					Payload: domain.ConnectorListResponsePayload{
-						NumConnectors: 2,
+					Payload: map[string]any{
+						"NumConnectors": 2,
 					},
 				},
 			},
@@ -673,9 +680,14 @@ func TestChargingStations(t *testing.T) {
 			}
 
 			// act
-			got := bp.ChargingStations(context.Background())
+			got, err := bp.ChargingStations(context.Background())
 
 			// assert
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+
 			assert.Equal(t, tt.want, got)
 		})
 	}

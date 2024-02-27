@@ -13,7 +13,7 @@ type ChargingStation struct {
 }
 
 type Connector struct {
-	ID                string    `json:"id"`
+	ID                int32     `json:"id"`
 	ChargingStationID string    `json:"chargingStationId"`
 	Reading           string    `json:"reading"`
 	UpdatedAt         time.Time `json:"updatedAt"`
@@ -27,8 +27,8 @@ type Store interface {
 }
 
 type Projection interface {
-	NumChargingStations(ctx context.Context) int
+	NumChargingStations(ctx context.Context) (int, error)
 	NumConnectors(ctx context.Context, stationID string) (int, error)
 	ChargingStation(ctx context.Context, stationID string) (ChargingStation, error)
-	ChargingStations(ctx context.Context) []ChargingStation
+	ChargingStations(ctx context.Context) ([]ChargingStation, error)
 }

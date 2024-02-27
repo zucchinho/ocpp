@@ -17,7 +17,7 @@ func TestInMemoryEventSource_Create_NoID(t *testing.T) {
 		MessageID:     "1",
 		MessageType:   "MessageType",
 		CorrelationID: "12345",
-		Payload:       []byte("payload"),
+		Payload:       make(map[string]any),
 	})
 
 	// assert
@@ -35,7 +35,7 @@ func TestInMemoryEventSource_Create_WithID(t *testing.T) {
 		MessageID:     "1",
 		MessageType:   "MessageType",
 		CorrelationID: "12345",
-		Payload:       []byte("payload"),
+		Payload:       make(map[string]any),
 	})
 
 	// assert
@@ -51,7 +51,7 @@ func TestInMemoryEventSource_Get(t *testing.T) {
 		MessageID:     "1",
 		MessageType:   "MessageType",
 		CorrelationID: "12345",
-		Payload:       []byte("payload"),
+		Payload:       make(map[string]any),
 	})
 
 	// act
@@ -64,7 +64,7 @@ func TestInMemoryEventSource_Get(t *testing.T) {
 		MessageID:     "1",
 		MessageType:   "MessageType",
 		CorrelationID: "12345",
-		Payload:       []byte("payload"),
+		Payload:       make(map[string]any),
 	}, event)
 }
 
@@ -88,14 +88,14 @@ func TestInMemoryEventSource_GetByCorrelationID(t *testing.T) {
 		MessageID:     "1",
 		MessageType:   "MessageType",
 		CorrelationID: "12345",
-		Payload:       []byte("payload"),
+		Payload:       make(map[string]any),
 	})
 	ies.Create(context.Background(), domain.Event{
 		ID:            "event-2",
 		MessageID:     "1",
 		MessageType:   "MessageType",
 		CorrelationID: "12345",
-		Payload:       []byte("payload"),
+		Payload:       make(map[string]any),
 	})
 
 	// act
@@ -108,14 +108,14 @@ func TestInMemoryEventSource_GetByCorrelationID(t *testing.T) {
 			MessageID:     "1",
 			MessageType:   "MessageType",
 			CorrelationID: "12345",
-			Payload:       []byte("payload"),
+			Payload:       make(map[string]any),
 		},
 		{
 			ID:            "event-2",
 			MessageID:     "1",
 			MessageType:   "MessageType",
 			CorrelationID: "12345",
-			Payload:       []byte("payload"),
+			Payload:       make(map[string]any),
 		},
 	}, events)
 }
@@ -128,14 +128,14 @@ func TestInMemoryEventSource_GetAll(t *testing.T) {
 		MessageID:     "1",
 		MessageType:   "MessageType",
 		CorrelationID: "12345",
-		Payload:       []byte("payload"),
+		Payload:       make(map[string]any),
 	})
 	ies.Create(context.Background(), domain.Event{
 		ID:            "event-2",
 		MessageID:     "1",
 		MessageType:   "MessageType",
 		CorrelationID: "12345",
-		Payload:       []byte("payload"),
+		Payload:       make(map[string]any),
 	})
 
 	// act
@@ -148,14 +148,14 @@ func TestInMemoryEventSource_GetAll(t *testing.T) {
 			MessageID:     "1",
 			MessageType:   "MessageType",
 			CorrelationID: "12345",
-			Payload:       []byte("payload"),
+			Payload:       make(map[string]any),
 		},
 		{
 			ID:            "event-2",
 			MessageID:     "1",
 			MessageType:   "MessageType",
 			CorrelationID: "12345",
-			Payload:       []byte("payload"),
+			Payload:       make(map[string]any),
 		},
 	}, events)
 }

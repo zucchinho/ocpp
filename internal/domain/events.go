@@ -13,15 +13,24 @@ const (
 	EventTypeConnectorListResponse   = "ConnectorListResponse"
 )
 
+type Event struct {
+	ID            string         `json:"id"`
+	MessageID     string         `json:"messageId"`
+	CorrelationID string         `json:"correlationId"`
+	MessageType   string         `json:"messageType"`
+	OccurredAt    time.Time      `json:"occurredAt"`
+	Payload       map[string]any `json:"payload"`
+}
+
 // MeterValuesRequestPayload is the payload for the MeterValuesRequest event.
 type MeterValuesRequestPayload struct {
 	StationID   string `json:"stationId"`
-	ConnectorID string `json:"connectorId"`
+	ConnectorID int32  `json:"connectorId"`
 }
 
 // MeterValue is a single meter value containing the reading for a connector.
 type MeterValue struct {
-	ConnectorID string `json:"connectorId"`
+	ConnectorID int32  `json:"connectorId"`
 	Reading     string `json:"reading"`
 }
 
@@ -44,15 +53,6 @@ type ConnectorListRequestPayload struct {
 // ConnectorListResponsePayload is the payload for the ConnectorListResponse event.
 type ConnectorListResponsePayload struct {
 	NumConnectors int `json:"numConnectors"`
-}
-
-type Event struct {
-	ID            string    `json:"id"`
-	MessageID     string    `json:"messageId"`
-	CorrelationID string    `json:"correlationId"`
-	MessageType   string    `json:"messageType"`
-	OccurredAt    time.Time `json:"occurredAt"`
-	Payload       any       `json:"payload"`
 }
 
 type EventProcessor interface {

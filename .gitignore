@@ -22,3 +22,6 @@ go.work
 
 # Generated code
 *.gen.go
+
+# binaries
+main
