@@ -87,9 +87,11 @@ func (bp *BasicProjection) ChargingStation(ctx context.Context, stationID string
 		payload := meterValuesResponseEvent.Payload.(domain.MeterValuesResponsePayload)
 		for _, meterValue := range payload.MeterValues {
 			var existingConnector *domain.Connector
-			for _, connector := range connectors {
+			var connectorIdx int
+			for i, connector := range connectors {
 				if connector.ID == meterValue.ConnectorID {
 					existingConnector = &connector
+					connectorIdx = i
 					break
 				}
 			}
@@ -98,6 +100,8 @@ func (bp *BasicProjection) ChargingStation(ctx context.Context, stationID string
 			if existingConnector != nil && existingConnector.UpdatedAt.Before(meterValuesResponseEvent.OccurredAt) {
 				existingConnector.Reading = meterValue.Reading
 				existingConnector.UpdatedAt = meterValuesResponseEvent.OccurredAt
+
+				connectors[connectorIdx] = *existingConnector
 			} else {
 				connectors = append(connectors, domain.Connector{
 					ID:                meterValue.ConnectorID,
