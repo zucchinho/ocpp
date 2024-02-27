@@ -23,22 +23,21 @@ func NewInMemoryEventSource() *InMemoryEventSource {
 
 func (ies *InMemoryEventSource) Create(ctx context.Context, event domain.Event) (string, error) {
 	ies.mu.Lock()
+	defer ies.mu.Unlock()
 
 	if event.ID == "" {
-		event.ID = "event-" + fmt.Sprint(len(ies.events))
+		event.ID = "event-" + fmt.Sprint(len(ies.events)+1)
 	}
 
 	ies.events[event.ID] = event
-
-	ies.mu.Unlock()
 
 	return event.ID, nil
 }
 
 func (ies *InMemoryEventSource) Get(ctx context.Context, id string) (domain.Event, error) {
 	ies.mu.Lock()
+	defer ies.mu.Unlock()
 	event, ok := ies.events[id]
-	ies.mu.Unlock()
 
 	if !ok {
 		return domain.Event{}, domain.ErrEventNotFound
@@ -47,7 +46,7 @@ func (ies *InMemoryEventSource) Get(ctx context.Context, id string) (domain.Even
 	return event, nil
 }
 
-func (ies *InMemoryEventSource) GetByCorrelationID(ctx context.Context, correlationID string) ([]domain.Event, error) {
+func (ies *InMemoryEventSource) GetByCorrelationID(ctx context.Context, correlationID string) []domain.Event {
 	ies.mu.Lock()
 	defer ies.mu.Unlock()
 
@@ -58,5 +57,17 @@ func (ies *InMemoryEventSource) GetByCorrelationID(ctx context.Context, correlat
 		}
 	}
 
-	return events, nil
+	return events
+}
+
+func (ies *InMemoryEventSource) GetAll(ctx context.Context) []domain.Event {
+	ies.mu.Lock()
+	defer ies.mu.Unlock()
+
+	var events []domain.Event
+	for _, event := range ies.events {
+		events = append(events, event)
+	}
+
+	return events
 }

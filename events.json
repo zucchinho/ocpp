@@ -69,7 +69,7 @@
     "correlationId": "7facea91-83b5-411e-bba1-b174c57765db",
     "messageId": "2",
     "occurredAt": "2022-01-01T00:01:00Z",
-    "messageType": "ConectorListRequest",
+    "messageType": "ConnectorListRequest",
     "payload": {
       "stationId": "95b8c8af-66c8-4429-8133-3ae9002663a7"
     }

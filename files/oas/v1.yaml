@@ -1,9 +1,0 @@
-openapi: 3.0.0
-
-info:
-  description: Add later
-  version: 1.0.0
-  title: OCPP server
-
-servers:
-  - url: /v1
